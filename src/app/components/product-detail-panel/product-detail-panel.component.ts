@@ -1,4 +1,4 @@
-import { Component, Inject, Input, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { FormsModule } from '@angular/forms';
@@ -13,20 +13,9 @@ import { Product } from 'app/services/product.service';
   templateUrl: './product-detail-panel.component.html',
 })
 export class ProductDetailPanelComponent {
-  data = inject(DRAWER_DATA) as { product: Product };
-  ref = inject(DrawerRef);
-
-  product;
+  product: Product = (inject(DRAWER_DATA) as { product: Product }).product;
+  private ref = inject(DrawerRef);
   qty = 1;
-
-  constructor(
-    @Inject(DRAWER_DATA) public drawerData: Product,
-    @Inject(DrawerRef) private drawerRef: DrawerRef<any>
-  ) { 
-
-    this.product=drawerData;
-
-  }
 
   addToCart() {
     console.log('Aggiunto al carrello:', this.product.name, 'x', this.qty);
