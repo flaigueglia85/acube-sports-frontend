@@ -1,0 +1,9 @@
+{
+  "/wp-json": {
+    "target": "https://acube-sports.local",
+    "secure": false,
+    "changeOrigin": true,
+    "cookieDomainRewrite": "acube-sports.local"
+  }
+
+}

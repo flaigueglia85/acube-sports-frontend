@@ -1,0 +1,42 @@
+<section class="woocommerce-cart">
+  <h2>Il tuo carrello</h2>
+
+  <div *ngIf="cart?.items?.length; else emptyCart">
+    <table class="shop_table cart" cellspacing="0">
+      <thead>
+        <tr>
+          <th class="product-name">Prodotto</th>
+          <th class="product-quantity">Quantità</th>
+          <th class="product-subtotal">Subtotale</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of cart?.items">
+          <td>{{ item.name }}</td>
+          <td>
+            <input type="number" class="w-16 text-center" [ngModel]="item.quantity"
+              (ngModelChange)="updateQuantity(item.key, $event)" min="1" />
+          </td>
+          <td>{{ item.subtotal_raw }}</td>
+          <td><button (click)="removeItem(item.key)">✕</button></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="cart as c; else emptyCart">
+      <!-- tabella -->
+      <div class="cart_totals">
+        <strong>Totale:</strong> {{ c.total_raw }}
+      </div>
+    </div>
+
+    <ng-template #emptyCart>
+      <p>Il carrello è vuoto.</p>
+    </ng-template>
+  </div>
+
+  <ng-template #emptyCart>
+    <p>Il tuo carrello è vuoto.</p>
+  </ng-template>
+</section>

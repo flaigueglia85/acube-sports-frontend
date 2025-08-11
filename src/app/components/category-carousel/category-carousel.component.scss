@@ -1,0 +1,7 @@
+/* src/app/components/category-carousel/category-carousel.component.scss */
+:host { display: block; }
+.team-card {
+  width: 160px;      /* w-40 */
+  height: 160px;     /* h-40 */
+  flex: 0 0 160px;   /* no shrink, base fissa */
+}

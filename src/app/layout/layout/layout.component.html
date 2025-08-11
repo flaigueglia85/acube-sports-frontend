@@ -1,0 +1,18 @@
+<!-- src/app/layout/layout.component.html -->
+<div class="min-h-screen">
+  <!-- Header fisso -->
+  <app-header></app-header>
+
+  <!-- Wrapper sotto-header: altezza = viewport - 4rem (h-16) -->
+  <div class="pt-16 h-screen">
+    <div class="h-[calc(100vh-4rem)] overflow-y-auto">
+      <main class="min-h-full">
+        <router-outlet></router-outlet>
+        <app-footer></app-footer>
+      </main>
+    </div>
+  </div>
+
+  <!-- host drawer material -->
+  <app-drawer-host></app-drawer-host>
+</div>

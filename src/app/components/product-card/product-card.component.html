@@ -1,0 +1,36 @@
+<div class="border rounded-xl shadow p-4 flex flex-col">
+  <img [src]="product.images?.[0]?.src || '/assets/placeholder.png'" [alt]="product.name"
+    class="h-40 object-contain mb-2" (click)="openDetail()" tabindex="0" role="button" (keyup.enter)="openDetail()"
+    (keyup.space)="openDetail()" />
+
+  <h2 class="font-semibold mb-1 line-clamp-2">{{ product.name }}</h2>
+  <p class="text-sm text-gray-500 mb-2">SKU: {{ product.sku }}</p>
+
+  <p class="text-xs mb-2" [class.text-red-600]="product.stock_status==='outofstock'"
+    [class.text-gray-600]="product.stock_status!=='outofstock'">
+    {{ availabilityLabel }}
+  </p>
+
+  <p class="text-lg font-bold mb-3">
+    {{ product.price | currency:'EUR':'symbol':'1.2-2' }}
+  </p>
+
+  <div class="mt-auto flex items-stretch gap-2">
+    <div class="flex items-center border rounded-lg overflow-hidden">
+      <button type="button" class="px-2 py-2 disabled:opacity-40" [disabled]="!canDecrement"
+        (click)="decrement()">−</button>
+
+      <!-- niente cast nel template: usiamo ngModel -->
+      <input type="number" class="w-14 text-center outline-none" [ngModel]="qty" (ngModelChange)="onQtyInput($event)"
+        min="1" [attr.max]="maxQty" />
+
+      <button type="button" class="px-2 py-2 disabled:opacity-40" [disabled]="!canIncrement"
+        (click)="increment()">+</button>
+    </div>
+
+    <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50"
+      [disabled]="product.stock_status === 'outofstock' || maxQty < 1" (click)="addToCart()">
+      {{ product.stock_status === 'outofstock' ? 'Esaurito' : 'Aggiungi al carrello' }}
+    </button>
+  </div>
+</div>

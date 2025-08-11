@@ -1,0 +1,12 @@
+<!-- contenitore fisso a pieno schermo sopra il layout -->
+<div class="fixed inset-0 z-[60] pointer-events-none">
+  <mat-drawer-container class="w-full h-full pointer-events-auto" [hasBackdrop]="true" (backdropClick)="onBackdropClick()">
+    <!-- content “vuoto”: serve solo per far vivere il container -->
+    <div></div>
+
+    <!-- drawer a destra -->
+    <mat-drawer #drawer position="end" mode="over" class="w-[420px] md:w-[520px]">
+      <app-product-detail-panel></app-product-detail-panel>
+    </mat-drawer>
+  </mat-drawer-container>
+</div>

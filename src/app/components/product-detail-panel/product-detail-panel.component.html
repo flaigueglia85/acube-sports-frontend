@@ -1,0 +1,55 @@
+<!-- Header -->
+<div class="h-14 flex items-center justify-between px-4 border-b">
+  <div class="font-semibold truncate">{{ product?.name || 'Dettaglio prodotto' }}</div>
+  <button (click)="close()" class="p-2 rounded hover:bg-gray-100" aria-label="Chiudi">
+    <ng-icon name="heroXMark" class="w-5 h-5"></ng-icon>
+  </button>
+</div>
+
+<!-- Body -->
+<div class="flex-1 overflow-y-auto p-4 space-y-4">
+  <div class="w-full aspect-video bg-white border rounded flex items-center justify-center">
+    <img [src]="product?.images?.[0]?.src || '/assets/placeholder.png'"
+         [alt]="product?.name || ''"
+         class="max-h-full max-w-full object-contain" />
+  </div>
+
+  <div class="space-y-1">
+    <div class="text-lg font-bold text-gray-900">
+      {{ product?.price | currency:'EUR':'symbol':'1.2-2':'it-IT' }}
+    </div>
+    <div class="text-sm text-gray-500">SKU: {{ product?.sku || '—' }}</div>
+    <div class="text-sm" [ngClass]="{'text-emerald-600': (maxQty||0) > 0, 'text-red-600': (maxQty||0) === 0}">
+      {{ isInfiniteStock ? 'Disponibilità: —' : ('Disponibili: ' + maxQty) }}
+    </div>
+  </div>
+
+  <!-- <div class="prose prose-sm max-w-none" *ngIf="product?.short_description" [innerHTML]="product?.short_description"></div> -->
+</div>
+
+<!-- Footer -->
+<div class="border-t p-4 flex items-center justify-between gap-3">
+  <div class="flex items-center gap-2">
+    <button class="w-9 h-9 inline-flex items-center justify-center border rounded-lg hover:bg-gray-50 disabled:opacity-40"
+            (click)="dec()" [disabled]="busy">
+      <ng-icon name="heroMinusSmall" class="w-4 h-4"></ng-icon>
+    </button>
+    <div class="w-10 text-center tabular-nums select-none">{{ qtyToAdd }}</div>
+    <button class="w-9 h-9 inline-flex items-center justify-center border rounded-lg hover:bg-gray-50 disabled:opacity-40"
+            (click)="inc()" [disabled]="busy || !canInc">
+      <ng-icon name="heroPlusSmall" class="w-4 h-4"></ng-icon>
+    </button>
+  </div>
+
+  <div class="flex items-center gap-2">
+    <button class="px-3 py-2 rounded-lg border text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+            (click)="removeLine()" [disabled]="busy || inCartQty===0">
+      Rimuovi
+    </button>
+    <button class="inline-flex items-center gap-2 bg-primary text-white px-3.5 py-2 rounded-lg hover:bg-primary/90 disabled:opacity-50"
+            (click)="addToCart()" [disabled]="busy || qtyToAdd<=0 || (!canInc && qtyToAdd>1)">
+      <ng-icon name="heroShoppingBag" class="w-5 h-5"></ng-icon>
+      Aggiungi
+    </button>
+  </div>
+</div>

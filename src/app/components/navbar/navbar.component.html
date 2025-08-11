@@ -1,0 +1,72 @@
+<nav class="relative">
+
+  <!-- Desktop -->
+  <div class="hidden md:flex items-center gap-6">
+    <a routerLink="/home" class="text-gray-700 hover:text-primary flex items-center gap-1">
+      <ng-icon name="heroHome" class="w-5 h-5"></ng-icon> Home
+    </a>
+
+    <a routerLink="/prodotti" class="text-gray-700 hover:text-primary flex items-center gap-1">
+      <ng-icon name="heroShoppingBag" class="w-5 h-5"></ng-icon> Prodotti
+    </a>
+
+    <div class="relative cursor-pointer text-gray-700 hover:text-primary" *ngIf="isAuthenticated"
+      (click)="toggleCart()">
+      <ng-icon name="heroShoppingCart" class="w-6 h-6"></ng-icon>
+
+      <ng-container *ngIf="(itemCount$ | async) as count">
+        <span *ngIf="count > 0"
+          class="absolute -top-2 -right-2.5 text-xs bg-red-600 text-white rounded-full px-1.5 py-0.5">
+          {{ count }}
+        </span>
+      </ng-container>
+
+      <!-- Popup carrello -->
+      <!-- Desktop popup -->
+      <div *ngIf="cartOpen"
+        class="absolute right-0 mt-2 w-[28rem] bg-white border border-gray-300 shadow-xl rounded-xl z-50"
+        (click)="$event.stopPropagation()">
+        <app-cart-mini></app-cart-mini>
+      </div>
+
+      <!-- Mobile accordion -->
+      <div *ngIf="cartMobileOpen" class="mt-2 border rounded-xl overflow-hidden" (click)="$event.stopPropagation()">
+        <app-cart-mini></app-cart-mini>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile trigger -->
+  <button class="md:hidden p-2 rounded hover:bg-gray-100" (click)="toggleMobile()">
+    <ng-icon *ngIf="!mobileOpen" name="heroBars3" class="w-6 h-6 text-gray-700"></ng-icon>
+    <ng-icon *ngIf="mobileOpen" name="heroXMark" class="w-6 h-6 text-gray-700"></ng-icon>
+  </button>
+
+  <!-- Mobile menu -->
+  <div *ngIf="mobileOpen"
+    class="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-md p-3 z-50 md:hidden">
+    <a routerLink="/home" class="flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-50" (click)="closeMobile()">
+      <ng-icon name="heroHome" class="w-5 h-5"></ng-icon> Home
+    </a>
+    <a routerLink="/prodotti" class="flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-50"
+      (click)="closeMobile()">
+      <ng-icon name="heroShoppingBag" class="w-5 h-5"></ng-icon> Prodotti
+    </a>
+
+    <div *ngIf="isAuthenticated" class="mt-2 border-t pt-2">
+      <button class="w-full flex items-center justify-between px-2 py-2 rounded hover:bg-gray-50"
+        (click)="toggleCartMobile()">
+        <span class="flex items-center gap-2">
+          <ng-icon name="heroShoppingCart" class="w-5 h-5"></ng-icon> Carrello
+        </span>
+        <span *ngIf="(itemCount$ | async) as count" class="text-xs bg-red-600 text-white rounded-full px-2.5 py-0.5">
+          {{ count || 0 }}
+        </span>
+      </button>
+
+      <div *ngIf="cartMobileOpen" class="mt-2 border rounded">
+        <app-cart-mini></app-cart-mini>
+      </div>
+    </div>
+  </div>
+</nav>

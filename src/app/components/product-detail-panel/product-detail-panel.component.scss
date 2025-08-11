@@ -1,0 +1,3 @@
+/* src/app/components/product-detail-drawer/product-detail-drawer.component.scss */
+:host { pointer-events: none; }
+:host > * { pointer-events: auto; } /* consente chiusura su overlay ma interazioni nel panel */

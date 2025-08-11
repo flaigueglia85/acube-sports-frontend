@@ -1,0 +1,55 @@
+<div class="flex items-center justify-center min-h-screen bg-gradient-to-br from-primary/5 to-primary/20 px-4">
+  <div class="bg-white shadow-xl rounded-xl p-8 w-full max-w-md relative border border-primary/10">
+
+    <!-- Branding Acube Sports -->
+    <div class="flex flex-col items-center mb-6">
+      <img src="/assets/logo-acube.svg" alt="Acube Sports" class="h-14 mb-2" />
+      <span class="text-sm text-primary tracking-wide font-medium">Benvenuto in Acube Sports</span>
+    </div>
+
+    <h1 class="text-2xl font-bold text-gray-800 text-center mb-6">Accedi al tuo account</h1>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
+      <!-- Username -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Username o Email</label>
+        <input
+          type="text"
+          formControlName="username"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+          placeholder="Inserisci il tuo username"
+        />
+      </div>
+
+      <!-- Password -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+        <input
+          type="password"
+          formControlName="password"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+          placeholder="••••••••"
+        />
+      </div>
+
+      <!-- Errore -->
+      <div *ngIf="error" class="text-red-600 text-sm">{{ error }}</div>
+
+      <!-- Pulsante login -->
+      <button
+        type="submit"
+        [disabled]="loading"
+        class="w-full bg-primary hover:bg-primary/90 text-white py-2 rounded-lg transition disabled:opacity-50"
+      >
+        <span *ngIf="!loading">Accedi</span>
+        <span *ngIf="loading">⏳ Accesso...</span>
+      </button>
+    </form>
+
+    <!-- Link registrazione -->
+    <p class="text-sm text-gray-600 text-center mt-6">
+      Non hai un account?
+      <a routerLink="/auth/register" class="text-primary hover:underline">Registrati</a>
+    </p>
+  </div>
+</div>

@@ -1,0 +1,27 @@
+<!-- src/app/pages/home/home.component.html -->
+<div class="min-h-screen bg-gradient-to-b from-primary/5 to-white">
+  
+  <!-- Hero Section -->
+  <section class="text-center py-16 px-4">
+    <!-- Logo Acube -->
+    <img
+      src="/assets/logo-acube.svg"
+      alt="Acube Sports"
+      class="mx-auto h-16 md:h-20 mb-4 drop-shadow-sm select-none pointer-events-none"
+      loading="lazy"
+    />
+    <h1 class="text-4xl font-bold text-primary mb-4">Benvenuto in Acube Sports</h1>
+    <p class="text-lg text-gray-700 max-w-2xl mx-auto mb-8">
+      Scopri il merchandising ufficiale delle tue squadre preferite di Serie A. 
+      Prodotti autentici, qualità garantita e passione sportiva in ogni dettaglio.
+    </p>
+    <a routerLink="/prodotti"
+       class="inline-block bg-primary text-white px-6 py-3 rounded-lg font-medium shadow hover:bg-primary/90 transition">
+      Vai al catalogo
+    </a>
+  </section>
+
+  <!-- Carosello Squadre -->
+  <app-category-carousel [visible]="4" [autoplayMs]="2200"></app-category-carousel>
+
+</div>
