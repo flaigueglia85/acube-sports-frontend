@@ -1,0 +1,15 @@
+<div class="fixed top-[64px] right-0 h-[calc(100vh-4rem)] w-full max-w-[720px] z-[100]">
+  <mat-drawer-container class="h-full w-full" [hasBackdrop]="true">
+    <div mat-drawer-content></div>
+
+    <mat-drawer
+      class="bg-white shadow-xl border-l rounded-l-xl pointer-events-auto"
+      [mode]="mode()"
+      [position]="position()"
+      [opened]="opened()"
+      [style.width]="width()"
+      (closedStart)="svc.close()">
+      <ng-template [cdkPortalOutlet]="portal()"></ng-template>
+    </mat-drawer>
+  </mat-drawer-container>
+</div>

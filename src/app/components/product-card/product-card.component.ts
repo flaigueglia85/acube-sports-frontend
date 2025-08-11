@@ -1,9 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Product } from '../../services/product.service';
+import { DrawerService } from '@shell/drawer/drawer.service';
 import { CartService } from '../../services/cart.service';
-import { ProductDetailDrawerService } from '../../services/product-detail-drawer.service';
+import { Product } from '../../services/product.service';
+import { ProductDetailPanelComponent } from '../product-detail-panel/product-detail-panel.component';
 
 @Component({
   selector: 'app-product-card',
@@ -15,10 +16,10 @@ export class ProductCardComponent {
   @Input() product!: Product;
   @Output() add = new EventEmitter<{ id: number; qty: number }>();
 
-    constructor(
+  constructor(
     private cart: CartService,
-    private drawer: ProductDetailDrawerService
-  ) {}
+    private drawer: DrawerService
+  ) { }
 
   qty = 1;
 
@@ -58,6 +59,17 @@ export class ProductCardComponent {
   }
 
   openDetail() {
-    this.drawer.open(this.product);
+    // this.drawer.open(ProductDetailPanelComponent, {
+    //   data: { product: this.product },
+    //   position: 'end',
+    //   mode: 'over',
+    //   width: '520px'
+    // });
+
+    this.drawer.open({
+      component: ProductDetailPanelComponent,
+      data: { product: this.product },
+
+    })
   }
 }

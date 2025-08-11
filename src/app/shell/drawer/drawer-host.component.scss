@@ -1,0 +1,12 @@
+mat-drawer-container {
+  height: 100%;
+  pointer-events: none;
+}
+mat-drawer {
+  background-color: white;
+  border-left: 1px solid #e0e0e0;
+  box-shadow: -2px 0 12px rgba(0, 0, 0, 0.15);
+  pointer-events: auto;
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}

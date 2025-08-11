@@ -105,3 +105,18 @@ app-root {
   text-align: center;
   font-weight: 500;
 }
+
+mat-drawer-container {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9999 !important;
+  height: 100vh !important;
+  pointer-events: none; /* per non interferire col contenuto */
+}
+
+mat-drawer {
+  pointer-events: auto;
+  background: white;
+  box-shadow: -2px 0 8px rgba(0,0,0,0.15);
+  
+}

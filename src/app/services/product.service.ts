@@ -17,6 +17,9 @@ export interface Product {
   manage_stock: boolean;
   stock_quantity: number|null;
   backorders_allowed: boolean;
+  categories?: { id: number; name: string }[]; // ← AGGIUNGI QUESTO
+  short_description?: string;
+  package_size?: string;
 }
 
 export interface Category {
