@@ -53,13 +53,15 @@ import { DrawerConfig, DrawerService } from '@shell/drawer/drawer.service';
       left: 0;
       right: 0;
       bottom: 0;
-      z-index: 1000;
+      z-index: 40; /* sotto l'header (z-50) */
       pointer-events: none;
     }
 
     .dynamic-drawer {
       pointer-events: auto;
       max-width: 90vw;
+      background: white;
+      box-shadow: -2px 0 8px rgba(0,0,0,0.15);
     }
 
     .drawer-header {
