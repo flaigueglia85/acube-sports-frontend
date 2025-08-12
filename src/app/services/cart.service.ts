@@ -51,4 +51,10 @@ export class CartService {
     return this.http.post<Cart>(`${this.base}/clear`, {}, { withCredentials: true })
       .pipe(tap(c => this.emitCart(c)));
   }
+
+  checkout(payload: any): Observable<any> {
+    return this.http
+      .post<any>('/wp-json/custom/v1/checkout', payload, { withCredentials: true })
+      .pipe(tap(() => this.emitCart({ items: [], total_raw: 0 })));
+  }
 }
