@@ -1,42 +1,27 @@
-<section class="woocommerce-cart">
-  <h2>Il tuo carrello</h2>
+<section class="container mx-auto p-4" *ngIf="cart?.items?.length; else emptyCart">
+  <h2 class="text-2xl font-semibold mb-4">Il tuo carrello</h2>
 
-  <div *ngIf="cart?.items?.length; else emptyCart">
-    <table class="shop_table cart" cellspacing="0">
-      <thead>
-        <tr>
-          <th class="product-name">Prodotto</th>
-          <th class="product-quantity">Quantità</th>
-          <th class="product-subtotal">Subtotale</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of cart?.items">
-          <td>{{ item.name }}</td>
-          <td>
-            <input type="number" class="w-16 text-center" [ngModel]="item.quantity"
-              (ngModelChange)="updateQuantity(item.key, $event)" min="1" />
-          </td>
-          <td>{{ item.subtotal_raw }}</td>
-          <td><button (click)="removeItem(item.key)">✕</button></td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div *ngIf="cart as c; else emptyCart">
-      <!-- tabella -->
-      <div class="cart_totals">
-        <strong>Totale:</strong> {{ c.total_raw }}
+  <div class="space-y-4">
+    <div *ngFor="let item of cart.items" class="flex items-center bg-white shadow rounded p-4">
+      <img *ngIf="item.image" [src]="item.image" [alt]="item.name" class="w-20 h-20 object-cover rounded mr-4" />
+      <div class="flex-1">
+        <p class="font-medium">{{ item.name }}</p>
+        <input type="number" class="border rounded w-20 mt-2 p-1 text-center" [ngModel]="item.quantity"
+               (ngModelChange)="updateQuantity(item.key, $event)" min="1" />
+      </div>
+      <div class="text-right">
+        <p class="font-semibold">{{ item.subtotal_raw | currency:'EUR' }}</p>
+        <button class="text-red-500 mt-2" (click)="removeItem(item.key)">Rimuovi</button>
       </div>
     </div>
-
-    <ng-template #emptyCart>
-      <p>Il carrello è vuoto.</p>
-    </ng-template>
   </div>
 
-  <ng-template #emptyCart>
-    <p>Il tuo carrello è vuoto.</p>
-  </ng-template>
+  <div class="flex justify-between items-center mt-6">
+    <p class="text-xl font-bold">Totale: {{ cart.total_raw | currency:'EUR' }}</p>
+    <a routerLink="/checkout" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Checkout</a>
+  </div>
 </section>
+
+<ng-template #emptyCart>
+  <p class="text-center mt-8">Il tuo carrello è vuoto.</p>
+</ng-template>

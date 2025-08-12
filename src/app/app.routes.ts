@@ -5,6 +5,7 @@ import { ProductCatalogComponent } from './features/product-catalog/product-cata
 import { CartComponent } from './components/cart/cart.component';
 import { LoginComponent } from './pages/login/login.component';
 import { LayoutComponent } from './layout/layout/layout.component';
+import { CheckoutComponent } from './pages/checkout/checkout.component';
 
 
 export const routes: Routes = [
@@ -21,7 +22,8 @@ export const routes: Routes = [
     children: [
       { path: '', component: HomeComponent },
       { path: 'prodotti', component: ProductCatalogComponent, },
-      { path: 'carrello', component: CartComponent }
+      { path: 'carrello', component: CartComponent },
+      { path: 'checkout', component: CheckoutComponent }
     ]
   },
 
