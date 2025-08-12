@@ -15,7 +15,7 @@
       <input type="email" name="email" [(ngModel)]="customer.email" required class="w-full border rounded p-2" />
     </div>
 
-    <p class="font-bold mt-4">Totale: {{ cart.total_raw | currency:'EUR' }}</p>
+    <p class="font-bold mt-4">Totale: {{ cart?.total_raw??0 | currency:'EUR' }}</p>
     <button type="submit" [disabled]="f.invalid" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
       Conferma e paga
     </button>
