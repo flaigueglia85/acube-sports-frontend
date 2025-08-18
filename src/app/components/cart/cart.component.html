@@ -1,27 +1,50 @@
-<section class="container mx-auto p-4" *ngIf="cart?.items?.length; else emptyCart">
-  <h2 class="text-2xl font-semibold mb-4">Il tuo carrello</h2>
+<section
+  class="min-h-[calc(100vh-4rem)] bg-gradient-to-b from-primary/5 to-white py-10"
+  *ngIf="cart?.items?.length; else emptyCart"
+>
+  <div class="max-w-4xl mx-auto px-4 space-y-10">
+    <h1 class="text-3xl font-extrabold tracking-tight text-primary text-center">Il tuo carrello</h1>
 
-  <div class="space-y-4">
-    <div *ngFor="let item of cart?.items" class="flex items-center bg-white shadow rounded p-4">
-      <img *ngIf="item.image" [src]="item.image" [alt]="item.name" class="w-20 h-20 object-cover rounded mr-4" />
-      <div class="flex-1">
-        <p class="font-medium">{{ item.name }}</p>
-        <input type="number" class="border rounded w-20 mt-2 p-1 text-center" [ngModel]="item.quantity"
-               (ngModelChange)="updateQuantity(item.key, $event)" min="1" />
-      </div>
-      <div class="text-right">
-        <p class="font-semibold">{{ item.subtotal_raw | currency:'EUR' }}</p>
-        <button class="text-red-500 mt-2" (click)="removeItem(item.key)">Rimuovi</button>
+    <!-- Lista prodotti -->
+    <div class="space-y-5">
+      <div *ngFor="let item of cart?.items" class="flex items-center bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+        <img *ngIf="item.image" [src]="item.image" [alt]="item.name" class="w-20 h-20 object-contain rounded mr-4" />
+
+        <div class="flex-1">
+          <p class="font-medium text-gray-900">{{ item.name }}</p>
+          <div class="mt-2 flex items-center gap-2">
+            <label class="text-sm text-gray-600" for="qty-{{ item.key }}">Quantità</label>
+            <input id="qty-{{ item.key }}" type="number"
+                   class="w-20 border border-gray-300 rounded-lg px-2 py-1 text-center text-sm"
+                   [ngModel]="item.quantity"
+                   (ngModelChange)="updateQuantity(item.key, $event)" min="1" />
+          </div>
+        </div>
+
+        <div class="text-right ml-4">
+          <p class="text-base font-semibold text-gray-800">
+            {{ item.subtotal_raw | currency:'EUR' }}
+          </p>
+          <button (click)="removeItem(item.key)" class="text-sm text-red-600 hover:underline mt-1">Rimuovi</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="flex justify-between items-center mt-6">
-    <p *ngIf="cart?.total_raw != null" class="text-xl font-bold">Totale: {{ cart?.total_raw??0 | currency:'EUR' }}</p>
-    <a routerLink="/checkout" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Checkout</a>
+    <!-- Totale + CTA -->
+    <div class="flex justify-between items-center pt-6 border-t">
+      <p class="text-xl font-bold text-gray-800">
+        Totale: {{ cart?.total_raw ?? 0 | currency:'EUR' }}
+      </p>
+      <a routerLink="/checkout"
+         class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-5 py-2 rounded-lg">
+        Procedi al checkout →
+      </a>
+    </div>
   </div>
 </section>
 
 <ng-template #emptyCart>
-  <p class="text-center mt-8">Il tuo carrello è vuoto.</p>
+  <div class="min-h-[calc(100vh-4rem)] flex items-center justify-center text-gray-500 text-center px-4">
+    Il tuo carrello è vuoto.
+  </div>
 </ng-template>

@@ -1,0 +1,36 @@
+<section class="min-h-[calc(100vh-4rem)] bg-white py-10">
+  <div class="max-w-3xl mx-auto px-4">
+    <h1 class="text-2xl font-bold text-center mb-8">Dettaglio ordine</h1>
+
+    <ng-container *ngIf="loading">Caricamento...</ng-container>
+    <ng-container *ngIf="error">Errore durante il recupero dell'ordine.</ng-container>
+
+    <ng-container *ngIf="order">
+      <div class="border rounded-lg p-6 shadow-sm space-y-4">
+        <div class="flex justify-between items-center">
+          <span class="text-lg font-semibold">Ordine #{{ order.id }}</span>
+          <span class="text-sm text-gray-500">{{ order.date }}</span>
+        </div>
+
+        <p class="text-sm text-gray-600">
+          Stato: <strong>{{ getStatusLabel(order.status) }}</strong>
+        </p>
+
+        <ul class="divide-y">
+          <li *ngFor="let item of order.items" class="flex items-center py-3">
+            <img *ngIf="item.image" [src]="item.image" class="w-12 h-12 object-contain mr-4" />
+            <div class="flex-1">
+              <p class="text-sm font-medium">{{ item.name }}</p>
+              <p class="text-xs text-gray-500">Quantità: {{ item.quantity }}</p>
+            </div>
+            <span class="text-sm">{{ item.total | currency:'EUR' }}</span>
+          </li>
+        </ul>
+
+        <div class="text-right font-semibold pt-4 border-t">
+          Totale: {{ order.total | currency:'EUR' }}
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</section>

@@ -1,143 +1,188 @@
-// src/app/components/category-carousel/category-carousel.component.ts
 import {
   AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { CategoryService, WcCategory } from '../../services/category.service';
+import { LoadingSpinnerComponent } from '@shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-category-carousel',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, LoadingSpinnerComponent],
   templateUrl: './category-carousel.component.html',
   styleUrls: ['./category-carousel.component.scss']
 })
 export class CategoryCarouselComponent implements AfterViewInit, OnDestroy {
-  @Input() visible = 4;        // quante card visibili
-  @Input() autoplayMs = 2200;  // intervallo autoplay
-
-  categories: WcCategory[] = [];
-  stream: WcCategory[] = [];   // duplicato per loop
-  loading = true;
+  @Input() baseSpeed = 90;     // px/sec desktop
+  @Input() baseSpeedMobile = 60;
+  @Input() licensed: string[] = ['Genoa','Atalanta','Como','Hellas Verona','AS Roma','Bologna'];
 
   @ViewChild('viewport', { static: true }) viewport!: ElementRef<HTMLDivElement>;
-  @ViewChild('track', { static: true }) track!: ElementRef<HTMLDivElement>;
+  @ViewChild('track',    { static: true }) track!: ElementRef<HTMLDivElement>;
 
-  viewportWidth = 0;   // <-- bindata in HTML
-  private stepPx = 0;  // distanza tra card (gap + larghezza)
-  private timer: any = null;
+  loading = true;
+  categories: WcCategory[] = [];
+  stream: WcCategory[] = [];
 
-  private licensed = ['Genoa','Atalanta','Como','Hellas Verona','AS Roma','Bologna'];
+  // animazione
+  transform = 'translateX(0)';
+  private pos = 0;             // posizione corrente in px (negativa verso sinistra)
+  private segW = 1;            // larghezza di un “segmento” (una lista)
+  private raf: number | null = null;
+  private lastTs = 0;
+  private speed = 80;          // px/sec corrente
+  private reduced = false;
+
+  // drag + inerzia
+  private dragging = false;
+  private dragStartX = 0;
+  private dragPosStart = 0;
+  private vx = 0;              // velocità per inerzia
+  private lastMoveTs = 0;
+  private ro?: ResizeObserver;
 
   constructor(private cats: CategoryService, private router: Router) {}
 
   ngAfterViewInit(): void {
+    this.reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     this.cats.getAllCategories().subscribe({
       next: (all) => {
         const byName = new Map(all.map(c => [c.name.toLowerCase(), c]));
-        const selected: WcCategory[] = this.licensed
+        const selected = this.licensed
           .map(n => byName.get(n.toLowerCase()))
           .filter((x): x is WcCategory => !!x)
           .map(c => ({ ...c, image: c.image ?? { src: '/assets/placeholder.png' } }));
 
         this.categories = selected;
-        this.stream = [...selected, ...selected]; // per loop
+        // triplichiamo per buffer infinito
+        this.stream = [...selected, ...selected, ...selected];
         this.loading = false;
 
-        setTimeout(() => {
-          this.computeMetrics();   // misura card & calcola viewportWidth/stepPx
-          this.startAutoplay();
+        queueMicrotask(() => {
+          this.measure();
+          this.setSpeedByDevice();
+          this.start();
         });
       },
       error: () => { this.loading = false; }
     });
 
-    // pausa autoplay su hover/tab nascosta
-    this.viewport.nativeElement.addEventListener('mouseenter', () => this.stopAutoplay());
-    this.viewport.nativeElement.addEventListener('mouseleave', () => this.startAutoplay());
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) this.stopAutoplay(); else this.startAutoplay();
-    });
-
-    // resize -> ricalcola dimensioni esatte
-    window.addEventListener('resize', this.computeMetrics);
+    document.addEventListener('visibilitychange', this.onVis);
+    this.ro = new ResizeObserver(() => this.measure());
+    this.ro.observe(this.track.nativeElement);
   }
 
   ngOnDestroy(): void {
-    this.stopAutoplay();
-    window.removeEventListener('resize', this.computeMetrics);
+    this.stop();
+    document.removeEventListener('visibilitychange', this.onVis);
+    this.ro?.disconnect();
   }
 
-  /** misura reale: distanza tra 1a e 2a card (step) e larghezza card */
-  computeMetrics = () => {
+  private onVis = () => document.hidden ? this.stop() : this.start();
+
+  private setSpeedByDevice() {
+    const isMobile = matchMedia('(max-width: 768px)').matches;
+    this.speed = isMobile ? this.baseSpeedMobile : this.baseSpeed;
+  }
+
+  private measure() {
+    // calcola larghezza di un segmento = somma card + gap per il primo “blocco”
     const cards = this.track.nativeElement.querySelectorAll<HTMLElement>('.team-card');
-    if (cards.length < 2) return;
+    if (!cards.length) return;
 
-    const first  = cards[0];
-    const second = cards[1];
+    // segmento = 1/3 della track (abbiamo triplicato)
+    this.segW = Math.max(1, Math.round(this.track.nativeElement.scrollWidth / 3));
+  }
 
-    // step = distanza orizzontale tra due card adiacenti (tiene conto del gap)
-    const step   = Math.round(second.offsetLeft - first.offsetLeft);
-    const width  = Math.round(first.getBoundingClientRect().width);
+  // loop RAF
+  private tick = (ts: number) => {
+    if (!this.lastTs) this.lastTs = ts;
+    const dt = Math.min(0.05, (ts - this.lastTs) / 1000); // clamp 50ms
+    this.lastTs = ts;
 
-    this.stepPx = step;
-    // viewportWidth = cardWidth + step*(visible-1)
-    this.viewportWidth = width + step * (this.visible - 1);
+    // applica velocità di base + eventuale inerzia
+    const v = (this.dragging ? 0 : this.speed) + this.vx;
+    this.pos -= v * dt;
+
+    // wrap modulo segW per loop perfetto
+    if (this.pos <= -this.segW) this.pos += this.segW;
+    if (this.pos >= 0)         this.pos -= this.segW;
+
+    this.transform = `translateX(${this.pos}px)`;
+
+    // smorzamento inerzia
+    if (!this.dragging) {
+      this.vx *= 0.94; // attrito
+      if (Math.abs(this.vx) < 2) this.vx = 0;
+    }
+
+    this.raf = requestAnimationFrame(this.tick);
   };
 
-  private startAutoplay() {
-    if (this.timer || this.loading || !this.stepPx) return;
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced) return;
-
-    const vp = this.viewport.nativeElement;
-    const tr = this.track.nativeElement;
-    const half = tr.scrollWidth / 2; // lunghezza della prima metà (prima del duplicato)
-
-    this.timer = setInterval(() => {
-      // se supero metà, “riavvolgo” senza salto visivo
-      if (vp.scrollLeft + this.stepPx >= half) {
-        // mantieni la stessa posizione relativa nella prima metà
-        vp.scrollLeft = vp.scrollLeft - half + this.stepPx;
-      } else {
-        vp.scrollBy({ left: this.stepPx, behavior: 'smooth' });
-      }
-    }, this.autoplayMs);
+  private start() {
+    if (this.reduced || this.loading || this.raf) return;
+    this.lastTs = 0;
+    this.raf = requestAnimationFrame(this.tick);
   }
 
-  private stopAutoplay() {
-    if (this.timer) {
-      clearInterval(this.timer);
-      this.timer = null;
-    }
+  private stop() {
+    if (this.raf) cancelAnimationFrame(this.raf);
+    this.raf = null;
+    this.lastTs = 0;
   }
 
-  prev() {
-    this.stopAutoplay();
-    const vp = this.viewport.nativeElement;
-    const tr = this.track.nativeElement;
-    const half = tr.scrollWidth / 2;
+  pause()  { this.stop(); }
+  resume() { this.setSpeedByDevice(); this.start(); }
 
-    if (vp.scrollLeft - this.stepPx < 0) {
-      // vai alla metà, meno uno step → effetto loop all’indietro
-      vp.scrollLeft = vp.scrollLeft + half - this.stepPx;
-    } else {
-      vp.scrollBy({ left: -this.stepPx, behavior: 'smooth' });
-    }
+  // piccoli scatti con i controlli
+  nudge(dir: 1 | -1) {
+    this.pause();
+    this.pos -= dir * (this.cardStep() * 1.1);
+    this.transform = `translateX(${this.pos}px)`;
+    this.resume();
   }
 
-  next() {
-    this.stopAutoplay();
-    const vp = this.viewport.nativeElement;
-    const tr = this.track.nativeElement;
-    const half = tr.scrollWidth / 2;
-
-    if (vp.scrollLeft + this.stepPx >= half) {
-      vp.scrollLeft = vp.scrollLeft - half + this.stepPx;
-    } else {
-      vp.scrollBy({ left: this.stepPx, behavior: 'smooth' });
+  private cardStep(): number {
+    // distanza media tra due card adiacenti
+    const cards = this.track.nativeElement.querySelectorAll<HTMLElement>('.team-card');
+    if (cards.length < 2) return 160 + 20;
+    const a = cards[0].getBoundingClientRect();
+    const b = cards[1].getBoundingClientRect();
+    return Math.abs(b.left - a.left);
     }
+
+  // Drag con inerzia
+  onPointerDown(ev: PointerEvent) {
+    (ev.target as Element).setPointerCapture?.(ev.pointerId);
+    this.dragging = true;
+    this.pause();
+    this.dragStartX = ev.clientX;
+    this.dragPosStart = this.pos;
+    this.vx = 0;
+    this.lastMoveTs = performance.now();
+  }
+  onPointerMove(ev: PointerEvent) {
+    if (!this.dragging) return;
+    const dx = ev.clientX - this.dragStartX;
+    this.pos = this.dragPosStart + dx;
+    // wrap per evitare salti quando trascini molto
+    if (this.pos <= -this.segW) this.pos += this.segW;
+    if (this.pos >= 0)         this.pos -= this.segW;
+    this.transform = `translateX(${this.pos}px)`;
+
+    const now = performance.now();
+    const dt = now - this.lastMoveTs;
+    if (dt > 0) this.vx = (dx / dt) * 1000; // px/sec
+    this.lastMoveTs = now;
+  }
+  onPointerUp(_: PointerEvent) {
+    if (!this.dragging) return;
+    this.dragging = false;
+    // mantiene un po' di inerzia ma limitata
+    this.vx = Math.max(-300, Math.min(300, this.vx));
+    this.resume();
   }
 
   goToCategory(cat: WcCategory) {

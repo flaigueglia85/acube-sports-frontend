@@ -12,10 +12,11 @@ export interface Product {
   name: string;
   sku: string;
   price: number;
+  price_raw?: number;
   images?: ProductImage[];
-  stock_status: 'instock'|'outofstock'|'onbackorder';
+  stock_status: 'instock' | 'outofstock' | 'onbackorder';
   manage_stock: boolean;
-  stock_quantity: number|null;
+  stock_quantity: number | null;
   backorders_allowed: boolean;
   categories?: { id: number; name: string }[]; // ← AGGIUNGI QUESTO
   short_description?: string;
@@ -29,9 +30,9 @@ export interface Category {
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
-  private readonly base = '/wp-json/wc/v3';
+  private readonly base = '/wp-json/custom/v1';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /**
    * Ritorna la lista prodotti con ricerca, categoria e filtro stock.
@@ -41,35 +42,24 @@ export class ProductService {
    * @param category ID categoria WooCommerce
    * @param stock    'instock' | 'outofstock'
    */
-  getProducts(
-    perPage = 20,
-    page = 1,
-    search = '',
-    category?: string,
-    stock?: string,
-  ): Observable<Product[]> {
-    let params = new HttpParams()
-      // .set('consumer_key', environment.wooCK)
-      // .set('consumer_secret', environment.wooCS)
-      .set('per_page', perPage)
-      .set('page', page);
+  getProducts(perPage = 20, page = 1, q = '', category?: string, stock?: string) {
+    const params: Record<string, string> = {
+      per_page: String(perPage),
+      page: String(page),
+    };
+    if (q) params['q'] = q.trim();
+    if (category) params['category'] = String(category);
+    if (stock) params['stock'] = stock; // 'instock' | 'outofstock'
 
-    if (search)   params = params.set('search', search);
-    if (category) params = params.set('category', category);
-    if (stock)    params = params.set('stock_status', stock);
-
-    return this.http.get<Product[]>(`${this.base}/products`, { params });
+    return this.http.get<Product[]>('/wp-json/custom/v1/products', {
+      params, withCredentials: true
+    });
   }
 
-  /** Elenco categorie pubbliche per la select filtro */
-  getCategories(): Observable<Category[]> {
-    const params = new HttpParams()
-      // .set('consumer_key', environment.wooCK)
-      // .set('consumer_secret', environment.wooCS)
-      .set('per_page', 100)       // recupera fino a 100 categorie
-      .set('hide_empty', 'true'); // mostra solo quelle con prodotti
-
-    return this.http.get<Category[]>(`${this.base}/products/categories`, { params });
+  getCategories() {
+    return this.http.get<{ id: number; name: string; image?: { src: string } }[]>('/wp-json/custom/v1/categories', {
+      withCredentials: true
+    });
   }
 
   /* altri metodi CRUD o dettagli prodotto in futuro… */

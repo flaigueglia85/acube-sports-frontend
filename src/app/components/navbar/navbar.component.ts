@@ -1,13 +1,14 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { NavigationStart, Route, Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { BehaviorSubject, map } from 'rxjs';
 import { CartMiniComponent } from '../cart-mini/cart-mini.component';
 
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import {
-  heroHome, heroShoppingBag, heroShoppingCart, heroBars3, heroXMark
+  heroHome, heroShoppingBag, heroShoppingCart, heroBars3, heroXMark,
+  heroClipboardDocumentCheck
 } from '@ng-icons/heroicons/outline';
 import { CartService } from '../../services/cart.service';
 
@@ -17,7 +18,7 @@ import { CartService } from '../../services/cart.service';
   imports: [CommonModule, RouterModule, CartMiniComponent, NgIconComponent],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss'],
-  providers: [provideIcons({ heroHome, heroShoppingBag, heroShoppingCart, heroBars3, heroXMark })]
+  providers: [provideIcons({ heroHome, heroShoppingBag, heroShoppingCart, heroBars3, heroXMark, heroClipboardDocumentCheck })]
 })
 export class NavbarComponent implements OnInit {
   itemCount$ = new BehaviorSubject<number>(0);
@@ -29,7 +30,8 @@ export class NavbarComponent implements OnInit {
 
   constructor(
     private cartService: CartService,
-    public auth: AuthService
+    public auth: AuthService,
+    private router:Router
   ) {}
 
   ngOnInit(): void {
@@ -44,6 +46,14 @@ export class NavbarComponent implements OnInit {
       // inizializza stato
       this.cartService.get().subscribe();
     }
+
+    // 👇 chiudi carrello quando navighi verso checkout (o ovunque)
+    this.router.events.subscribe(ev => {
+      if (ev instanceof NavigationStart) {
+        this.cartOpen = false;
+        this.cartMobileOpen = false;
+      }
+    });
   }
 
   toggleMobile() {

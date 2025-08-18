@@ -1,0 +1,16 @@
+.toast {
+      pointer-events: auto;
+      min-width: 260px; max-width: 420px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.12);
+      display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px;
+      border: 1px solid transparent;
+    }
+    .msg { font-size: 14px; line-height: 1.3; }
+    .x { all: unset; cursor: pointer; padding: 0 6px; font-size: 18px; opacity: .6; }
+    .x:hover { opacity: 1; }
+    /* Varianti */
+    .info    { background:#eef6ff; color:#0b5cab; border-color:#cfe6ff; }
+    .success { background:#ecfdf5; color:#065f46; border-color:#bbf7d0; }
+    .warning { background:#fff7ed; color:#9a3412; border-color:#fed7aa; }

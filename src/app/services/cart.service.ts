@@ -8,16 +8,25 @@ export interface CartItem {
   product_id: number;
   name: string;
   quantity: number;
+  unit_price: number;
   subtotal_raw: number;
+  total_raw: number;
+  sku: string;
   image?: string | null;
 }
-export interface Cart { items: CartItem[]; total_raw: number; }
+
+
+export interface CartCoupon {
+  code: string;
+  amount: number;
+}
+export interface Cart { items: CartItem[]; total_raw: number;subtotal:number;discount_total:number;coupons: CartCoupon[]; }
 
 @Injectable({ providedIn: 'root' })
 export class CartService {
   private readonly base = '/wp-json/custom/v1/cart';
 
-  private _cart$ = new BehaviorSubject<Cart>({ items: [], total_raw: 0 });
+  private _cart$ = new BehaviorSubject<Cart>({ items: [], total_raw: 0 ,subtotal:0,discount_total:0, coupons: []});
   cartUpdated$ = this._cart$.asObservable();
 
   constructor(private http: HttpClient) { }
@@ -55,6 +64,6 @@ export class CartService {
   checkout(payload: any): Observable<any> {
     return this.http
       .post<any>('/wp-json/custom/v1/checkout', payload, { withCredentials: true })
-      .pipe(tap(() => this.emitCart({ items: [], total_raw: 0 })));
+      .pipe(tap(() => this.emitCart({ items: [], total_raw: 0,subtotal:0,discount_total:0 , coupons: []})));
   }
 }

@@ -1,34 +1,34 @@
-import { Injectable } from '@angular/core';
-import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
+// toast.service.ts
+import { Injectable, inject } from '@angular/core';
+import { Toast } from '@shared/models/toast.model';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ToastService {
-  private baseConfig: MatSnackBarConfig = {
-    duration: 300000,
-    horizontalPosition: 'center',
-    verticalPosition: 'bottom',
-  };
+  private _toasts$ = new BehaviorSubject<Toast[]>([]);
+  toasts$ = this._toasts$.asObservable();
 
-  constructor(private snack: MatSnackBar) {}
-
-  success(message: string): void {
-    this.snack.open(message, 'Chiudi', {
-      ...this.baseConfig,
-      panelClass: ['custom-toast','bg-green-600', 'text-white'],
-    });
+  show(message: string, opts: Partial<Toast> = {}) {
+    const t: Toast = {
+      id: crypto.randomUUID(),
+      message,
+      type: opts.type ?? 'info',
+      pos: opts.pos ?? 'bottom-center',
+      anim: opts.anim ?? 'slide',
+      timeout: opts.timeout ?? 3000,
+    };
+    this._toasts$.next([t, ...this._toasts$.value]);
+    if (t.timeout > 0) setTimeout(() => this.dismiss(t.id), t.timeout);
+    return t.id;
   }
 
-  error(message: string): void {
-    this.snack.open(message, 'Chiudi', {
-      ...this.baseConfig,
-      panelClass: ['custom-toast','bg-red-600', 'text-white'],
-    });
+  info(msg: string, opts: Partial<Toast> = {})   { return this.show(msg, { ...opts, type: 'info'    }); }
+  success(msg: string, opts: Partial<Toast> = {}){ return this.show(msg, { ...opts, type: 'success' }); }
+  warning(msg: string, opts: Partial<Toast> = {}){ return this.show(msg, { ...opts, type: 'warning' }); }
+
+  dismiss(id: string) {
+    this._toasts$.next(this._toasts$.value.filter(t => t.id !== id));
   }
 
-  info(message: string): void {
-    this.snack.open(message, 'Chiudi', {
-      ...this.baseConfig,
-      panelClass: ['custom-toast','bg-blue-600', 'text-white'],
-    });
-  }
+  clear() { this._toasts$.next([]); }
 }

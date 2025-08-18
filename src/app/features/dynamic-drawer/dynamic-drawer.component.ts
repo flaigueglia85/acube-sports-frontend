@@ -7,6 +7,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { Subject, takeUntil } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { DrawerConfig, DrawerService } from '@shell/drawer/drawer.service';
+import { heroXCircle } from '@ng-icons/heroicons/outline';
+import { NgIconsModule } from '@ng-icons/core';
 
 @Component({
   selector: 'app-dynamic-drawer',
@@ -15,37 +17,9 @@ import { DrawerConfig, DrawerService } from '@shell/drawer/drawer.service';
     CommonModule,
     MatSidenavModule,
     MatButtonModule,
-    MatIconModule
+    NgIconsModule
   ],
-  template: `
-    <mat-drawer-container class="drawer-container" [hasBackdrop]="!isDesktop">
-      <mat-drawer 
-        #drawer 
-        [mode]="drawerMode" 
-        [opened]="isOpen"
-        [disableClose]="config?.disableClose || false"
-        position="end"
-        class="dynamic-drawer"
-        [style.width]="drawerWidth"
-        (openedChange)="onDrawerToggle($event)">
-        
-        <!-- Header del drawer -->
-        <div class="drawer-header">
-          <button 
-            mat-icon-button 
-            (click)="closeDrawer()"
-            class="close-button">
-            <mat-icon>close</mat-icon>
-          </button>
-        </div>
-
-        <!-- Contenuto dinamico -->
-        <div class="drawer-content">
-          <ng-container #dynamicContent></ng-container>
-        </div>
-      </mat-drawer>
-    </mat-drawer-container>
-  `,
+  templateUrl: './dynamic-drawer.component.html',
   styles: [`
     .drawer-container {
       position: fixed;

@@ -9,8 +9,9 @@ import { ProductDetailPanelComponent } from '../product-detail-panel/product-det
 @Component({
   selector: 'app-product-card',
   standalone: true,
-  imports: [CommonModule, FormsModule],              // <- aggiunto FormsModule
-  templateUrl: './product-card.component.html'
+  imports: [CommonModule, FormsModule],
+  templateUrl: './product-card.component.html',
+  styleUrls: ['./product-card.component.scss']
 })
 export class ProductCardComponent {
   @Input() product!: Product;
@@ -19,7 +20,7 @@ export class ProductCardComponent {
   constructor(
     private cart: CartService,
     private drawer: DrawerService
-  ) { }
+  ) {}
 
   qty = 1;
 
@@ -30,21 +31,27 @@ export class ProductCardComponent {
     }
     return 9999;
   }
-
   get canIncrement(): boolean { return this.qty < this.maxQty; }
   get canDecrement(): boolean { return this.qty > 1; }
 
+  // prezzo già scontato lato backend -> niente ricalcoli
+  get hasUserDiscount(): boolean {
+    return (this.product.price_raw ?? this.product.price) > this.product.price + 0.0001;
+  }
+  get userDiscountPercent(): number {
+    const raw = this.product.price_raw ?? this.product.price;
+    return raw > 0 ? Math.round((1 - this.product.price / raw) * 100) : 0;
+  }
+
   increment() { if (this.canIncrement) this.qty++; }
   decrement() { if (this.canDecrement) this.qty--; }
-
   onQtyInput(val: number | string) {
     const n = Math.max(1, Number(val) || 1);
     this.qty = Math.min(n, this.maxQty);
   }
-
   addToCart() {
     if (this.product.stock_status === 'outofstock') return;
-    this.qty = Math.min(this.qty, this.maxQty); // clamp finale
+    this.qty = Math.min(this.qty, this.maxQty);
     this.add.emit({ id: this.product.id, qty: this.qty });
   }
 
@@ -59,17 +66,9 @@ export class ProductCardComponent {
   }
 
   openDetail() {
-    // this.drawer.open(ProductDetailPanelComponent, {
-    //   data: { product: this.product },
-    //   position: 'end',
-    //   mode: 'over',
-    //   width: '520px'
-    // });
-
     this.drawer.open({
       component: ProductDetailPanelComponent,
       data: { product: this.product },
-
-    })
+    });
   }
 }

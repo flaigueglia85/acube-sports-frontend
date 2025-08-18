@@ -1,0 +1,21 @@
+.badge-triangle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 70px;
+  height: 70px;
+  background: #dc2626; /* rosso */
+  clip-path: polygon(100% 0, 0 0, 100% 100%);
+  border-top-right-radius: 8px; /* arrotondamento */
+  display: flex;
+  align-items: center;   /* centra verticalmente */
+  justify-content: center; /* centra orizzontalmente */
+}
+
+.badge-triangle span {
+  color: #fff;
+  font-weight: 700;
+  font-size: 20px;
+  transform: rotate(45deg) translateY(-45%);
+  white-space: nowrap;
+}

@@ -1,7 +1,16 @@
-<div class="border rounded-xl shadow p-4 flex flex-col">
-  <img [src]="product.images?.[0]?.src || '/assets/placeholder.png'" [alt]="product.name"
-    class="h-40 object-contain mb-2" (click)="openDetail()" tabindex="0" role="button" (keyup.enter)="openDetail()"
-    (keyup.space)="openDetail()" />
+<div class="border rounded-xl bg-white shadow p-4 flex flex-col">
+  <!-- immagine con badge -->
+  <div class="relative mb-2">
+    <img [src]="product.images?.[0]?.src || '/assets/placeholder.png'" [alt]="product.name"
+      class="h-40 w-full object-contain cursor-pointer" (click)="openDetail()" tabindex="0" role="button"
+      (keyup.enter)="openDetail()" (keyup.space)="openDetail()" />
+
+    <!-- badge triangolare -->
+    <!-- triangolo con testo dentro -->
+    <div *ngIf="hasUserDiscount" class="badge-triangle">
+      <span>-{{ userDiscountPercent }}%</span>
+    </div>
+  </div>
 
   <h2 class="font-semibold mb-1 line-clamp-2">{{ product.name }}</h2>
   <p class="text-sm text-gray-500 mb-2">SKU: {{ product.sku }}</p>
@@ -11,9 +20,26 @@
     {{ availabilityLabel }}
   </p>
 
-  <p class="text-lg font-bold mb-3">
-    {{ product.price | currency:'EUR':'symbol':'1.2-2' }}
-  </p>
+  <div class="mb-3">
+    <ng-container *ngIf="hasUserDiscount; else noDisc">
+      <div class="flex items-baseline gap-2">
+        <span class="text-sm text-gray-500 line-through">
+          {{ product.price_raw | currency:'EUR':'symbol':'1.2-2' }}
+        </span>
+        <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-semibold">
+          -{{ userDiscountPercent }}%
+        </span>
+      </div>
+      <div class="text-lg font-bold text-emerald-700">
+        {{ product.price | currency:'EUR':'symbol':'1.2-2' }}
+      </div>
+    </ng-container>
+    <ng-template #noDisc>
+      <div class="text-lg font-bold">
+        {{ product.price | currency:'EUR':'symbol':'1.2-2' }}
+      </div>
+    </ng-template>
+  </div>
 
   <div class="mt-auto flex items-stretch gap-2">
     <div class="flex items-center border rounded-lg overflow-hidden">

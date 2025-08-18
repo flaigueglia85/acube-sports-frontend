@@ -1,0 +1,26 @@
+<mat-drawer-container class="drawer-container" [hasBackdrop]="!isDesktop">
+      <mat-drawer 
+        #drawer 
+        [mode]="drawerMode" 
+        [opened]="isOpen"
+        [disableClose]="config?.disableClose || false"
+        position="end"
+        class="dynamic-drawer"
+        [style.width]="drawerWidth"
+        (openedChange)="onDrawerToggle($event)">
+        
+        <!-- Header del drawer -->
+        <div class="drawer-header">
+          <button 
+            (click)="closeDrawer()"
+            class="close-button">
+            <ng-icon name="heroXMark" class="w-5 h-5"></ng-icon>
+          </button>
+        </div>
+
+        <!-- Contenuto dinamico -->
+        <div class="drawer-content">
+          <ng-container #dynamicContent></ng-container>
+        </div>
+      </mat-drawer>
+    </mat-drawer-container>

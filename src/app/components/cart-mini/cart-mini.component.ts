@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { NgIconComponent } from '@ng-icons/core';
 import { heroTrash, heroMinusSmall, heroPlusSmall } from '@ng-icons/heroicons/outline';
 import { provideIcons } from '@ng-icons/core';

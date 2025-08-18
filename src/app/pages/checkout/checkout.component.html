@@ -1,60 +1,134 @@
-<section class="container mx-auto p-4" *ngIf="cart?.items?.length; else emptyCart">
-  <div class="grid md:grid-cols-2 gap-8">
-    <form (ngSubmit)="submitOrder()" #f="ngForm" class="space-y-4">
-      <h2 class="text-2xl font-semibold mb-4">Informazioni di contatto</h2>
-      <p class="text-sm text-gray-600">Utilizzeremo questa email per inviare i dettagli e gli aggiornamenti relativi al tuo ordine.</p>
-      <div>
-        <label class="block mb-1">Indirizzo email</label>
-        <input type="email" name="email" [(ngModel)]="customer.email" readonly required class="w-full border rounded p-2 bg-gray-100" />
-      </div>
-      <div class="flex items-start">
-        <input type="checkbox" id="newsletter" name="newsletter" [(ngModel)]="newsletter" class="mr-2 mt-1">
-        <label for="newsletter" class="text-sm">
-          Rimani aggiornato senza spam! Iscriviti alla nostra newsletter. I dati saranno trattati secondo la Privacy Policy. (facoltativo)
-        </label>
-      </div>
+<!-- LOADING -->
+<div *ngIf="loading" class="min-h-[calc(100vh-4rem)] flex items-center justify-center">
+  <app-loading-spinner label="Caricamento..."></app-loading-spinner>
+</div>
 
-      <h3 class="text-xl font-semibold mt-6">Opzioni di pagamento</h3>
-      <div class="border rounded p-4">
-        <p class="font-medium mb-1">Bonifico bancario</p>
-        <p class="text-sm text-gray-600">Effettua il pagamento tramite bonifico bancario. Usa l'ID dell'ordine come causale. Il tuo ordine non verrà spedito finché i fondi non risulteranno trasferiti nel nostro conto corrente.</p>
-      </div>
+<div *ngIf="submitting" class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+  <app-loading-spinner label="Invio ordine..."></app-loading-spinner>
+</div>
 
-      <div class="flex items-start">
-        <input type="checkbox" id="terms" name="terms" [(ngModel)]="acceptTerms" required class="mr-2 mt-1">
-        <label for="terms" class="text-sm">
-          Devi accettare Termini e condizioni e Informativa sulla privacy per continuare con l'acquisto.
-        </label>
-      </div>
+<section class="min-h-[calc(100vh-4rem)] bg-gradient-to-b from-primary/5 to-white py-10"
+  *ngIf="!loading && cart?.items?.length">
+  <div class="max-w-5xl mx-auto px-4">
+    <h1 class="text-3xl font-extrabold tracking-tight text-primary text-center mb-10">Checkout</h1>
 
-      <div class="flex justify-between mt-4">
-        <a routerLink="/cart" class="text-blue-600 hover:underline">Torna al carrello</a>
-        <button type="submit" [disabled]="f.invalid || !acceptTerms" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Effettua ordine</button>
-      </div>
-    </form>
+    <div class="grid md:grid-cols-2 gap-10">
+      <!-- FORM -->
+      <form #f="ngForm" (ngSubmit)="submitOrder(f)" class="space-y-5">
+        <h2 class="text-xl font-semibold">Informazioni di contatto</h2>
+        <p class="text-sm text-gray-600">
+          Utilizzeremo questa email per inviare i dettagli e gli aggiornamenti relativi al tuo ordine.
+        </p>
 
-    <div>
-      <h2 class="text-2xl font-semibold mb-4">Riepilogo dell'ordine</h2>
-      <div *ngFor="let item of cart.items" class="mb-4 border-b pb-4">
-        <div class="flex justify-between">
-          <span>{{ item.quantity }}x {{ item.name }}</span>
-          <span>{{ (item.subtotal_raw / item.quantity) | currency:'EUR' }}</span>
+        <div>
+          <label class="block text-sm font-medium mb-1">Indirizzo email</label>
+          <input type="email" name="email" [(ngModel)]="customer.email" required
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-100 text-sm" />
         </div>
-        <p class="text-sm text-gray-600">Prezzo totale per {{ item.quantity }} {{ item.name }} elemento{{ item.quantity > 1 ? 'i' : '' }}: {{ item.subtotal_raw | currency:'EUR' }}</p>
-      </div>
-      <a class="text-blue-600 hover:underline cursor-pointer">Aggiungi codici promozionali</a>
-      <div class="flex justify-between mt-4">
-        <span>Subtotale</span>
-        <span>{{ cart.total_raw | currency:'EUR' }}</span>
-      </div>
-      <div class="flex justify-between font-bold mt-2">
-        <span>Totale</span>
-        <span>{{ cart.total_raw | currency:'EUR' }}</span>
+
+        <div class="flex items-start">
+          <input type="checkbox" id="newsletter" name="newsletter" [(ngModel)]="newsletter" class="mt-1 mr-2">
+          <label for="newsletter" class="text-sm text-gray-700">
+            Rimani aggiornato senza spam! Iscriviti alla nostra newsletter. I dati saranno trattati secondo la Privacy
+            Policy. (facoltativo)
+          </label>
+        </div>
+
+        <h3 class="text-lg font-semibold pt-4">Opzioni di pagamento</h3>
+        <div class="border border-gray-200 rounded-lg p-4 bg-white">
+          <p class="font-medium mb-1">Bonifico bancario</p>
+          <p class="text-sm text-gray-600">
+            Effettua il pagamento tramite bonifico bancario. Usa l'ID dell'ordine come causale. Il tuo ordine non verrà
+            spedito finché i fondi non risulteranno trasferiti nel nostro conto corrente.
+          </p>
+        </div>
+
+        <div class="flex items-start">
+          <input type="checkbox" id="terms" name="terms" [(ngModel)]="acceptTerms" required class="mt-1 mr-2">
+          <label for="terms" class="text-sm text-gray-700">
+            Devi accettare Termini e condizioni e Informativa sulla privacy per continuare con l'acquisto.
+          </label>
+        </div>
+
+        <div class="flex justify-between items-center pt-4">
+          <a routerLink="/prodotti" class="text-blue-600 hover:underline text-sm">← Continua a comprare</a>
+          <button type="submit" [disabled]="f.invalid || !acceptTerms || submitting"
+            class="relative bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg text-sm flex items-center justify-center disabled:opacity-60">
+            <ng-container *ngIf="!submitting; else btnLoading">Effettua ordine</ng-container>
+            <ng-template #btnLoading>
+              <svg class="animate-spin h-4 w-4 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+              </svg>
+              Invio…
+            </ng-template>
+          </button>
+        </div>
+      </form>
+
+      <!-- RIEPILOGO -->
+      <div class="bg-white border border-gray-200 rounded-lg p-5 space-y-4 h-fit">
+        <h2 class="text-xl font-semibold">Riepilogo dell'ordine</h2>
+
+        <!-- prodotti -->
+        <div *ngFor="let item of cart?.items" class="border-b pb-4">
+          <div class="flex justify-between">
+            <span>{{ item.quantity }}x {{ item.name }}</span>
+            <span>{{ item.unit_price | currency:'EUR' }}</span>
+          </div>
+          <p class="text-sm text-gray-600">
+            Totale riga: {{ item.total_raw | currency:'EUR' }}
+          </p>
+        </div>
+
+        <!-- coupon -->
+        <div class="pt-2">
+          <label class="block text-sm font-medium mb-1">Codice promozionale</label>
+          <div class="flex gap-2">
+            <input [(ngModel)]="couponCode" placeholder="Inserisci codice"
+              class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+            <button type="button" (click)="applyCoupon()"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+              Applica
+            </button>
+          </div>
+
+          <div *ngIf="cart?.coupons?.length" class="mt-2 space-y-1">
+            <div *ngFor="let c of cart?.coupons"
+                 class="flex justify-between items-center bg-gray-50 rounded px-2 py-1 text-sm">
+              <span>{{ c.code }}</span>
+              <span class="text-green-700">-{{ c.amount | currency:'EUR' }}</span>
+              <button type="button" (click)="removeCoupon(c.code)" class="ml-2 text-red-600 hover:underline">
+                Rimuovi
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- totali -->
+        <div class="flex justify-between text-sm pt-2">
+          <span>Subtotale</span>
+          <span>{{ cart?.subtotal | currency:'EUR' }}</span>
+        </div>
+
+        <div *ngIf="(cart?.discount_total ?? 0) > 0"
+             class="flex justify-between text-sm text-green-700">
+          <span>Sconti</span>
+          <span>-{{ cart?.discount_total | currency:'EUR' }}</span>
+        </div>
+
+        <div class="flex justify-between font-semibold text-base pt-1 border-t pt-3">
+          <span>Totale</span>
+          <span>{{ cart?.total_raw | currency:'EUR' }}</span>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<ng-template #emptyCart>
-  <p class="text-center mt-8">Il tuo carrello è vuoto.</p>
+<ng-template [ngIf]="!loading && (!cart || !cart.items?.length)">
+  <div class="min-h-[calc(100vh-4rem)] flex items-center justify-center text-gray-500 text-center px-4">
+    Il tuo carrello è vuoto.
+  </div>
 </ng-template>

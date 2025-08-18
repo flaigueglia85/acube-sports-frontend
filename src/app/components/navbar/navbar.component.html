@@ -10,6 +10,10 @@
       <ng-icon name="heroShoppingBag" class="w-5 h-5"></ng-icon> Prodotti
     </a>
 
+    <a routerLink="/account/orders" class="text-gray-700 hover:text-primary flex items-center gap-1">
+      <ng-icon name="heroClipboardDocumentCheck" class="w-5 h-5"></ng-icon> Ordini
+    </a>
+
     <div class="relative cursor-pointer text-gray-700 hover:text-primary" *ngIf="isAuthenticated"
       (click)="toggleCart()">
       <ng-icon name="heroShoppingCart" class="w-6 h-6"></ng-icon>
@@ -34,6 +38,7 @@
         <app-cart-mini></app-cart-mini>
       </div>
     </div>
+
   </div>
 
   <!-- Mobile trigger -->
@@ -55,6 +60,12 @@
 
     <div *ngIf="isAuthenticated" class="mt-2 border-t pt-2">
       <button class="w-full flex items-center justify-between px-2 py-2 rounded hover:bg-gray-50"
+        routerLink="/account/orders">
+        <span class="flex items-center gap-2">
+          <ng-icon name="archiveBoxArrowDown" class="w-5 h-5"></ng-icon> Ordini
+        </span>
+      </button>
+      <button class="w-full flex items-center justify-between px-2 py-2 rounded hover:bg-gray-50"
         (click)="toggleCartMobile()">
         <span class="flex items-center gap-2">
           <ng-icon name="heroShoppingCart" class="w-5 h-5"></ng-icon> Carrello
@@ -67,6 +78,8 @@
       <div *ngIf="cartMobileOpen" class="mt-2 border rounded">
         <app-cart-mini></app-cart-mini>
       </div>
+
+
     </div>
   </div>
 </nav>

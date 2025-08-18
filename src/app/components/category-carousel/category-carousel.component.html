@@ -1,29 +1,40 @@
-<!-- src/app/components/category-carousel/category-carousel.component.html -->
 <section class="px-4 py-10 bg-gradient-to-b from-white to-primary/5">
   <h2 class="text-2xl font-semibold text-center mb-8 text-primary">Le nostre squadre</h2>
 
-  <div class="relative max-w-6xl mx-auto">
-    <!-- controls desktop -->
-    <button type="button"
-            class="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white border border-gray-200 shadow rounded-full w-9 h-9 items-center justify-center hover:bg-gray-50"
-            (click)="prev()">‹</button>
-    <button type="button"
-            class="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white border border-gray-200 shadow rounded-full w-9 h-9 items-center justify-center hover:bg-gray-50"
-            (click)="next()">›</button>
+  <div class="carousel max-w-6xl mx-auto">
+    <!-- Controls desktop -->
+    <button type="button" class="ctrl left hidden md:flex" (click)="nudge(-1)" aria-label="precedente">‹</button>
+    <button type="button" class="ctrl right hidden md:flex" (click)="nudge(1)"  aria-label="successiva">›</button>
 
-    <div *ngIf="loading" class="text-center text-gray-500">Caricamento…</div>
+    <div *ngIf="loading" class="text-center text-gray-500 py-12">
+      <app-loading-spinner label="Caricamento..." size="lg"></app-loading-spinner>
+    </div>
 
-    <!-- viewport: larghezza calcolata per mostrare esattamente `visible` card -->
-    <div #viewport class="overflow-hidden mx-auto" [style.width.px]="viewportWidth">
-      <div #track class="flex gap-6 will-change-transform">
+    <div #viewport
+         class="viewport"
+         (mouseenter)="pause()"
+         (mouseleave)="resume()"
+         (pointerdown)="onPointerDown($event)"
+         (pointermove)="onPointerMove($event)"
+         (pointerup)="onPointerUp($event)"
+         (pointercancel)="onPointerUp($event)"
+         (pointerleave)="onPointerUp($event)">
+
+      <!-- gradient edges -->
+      <div class="edge left" aria-hidden="true"></div>
+      <div class="edge right" aria-hidden="true"></div>
+
+      <div #track class="track" [style.transform]="transform">
         <div *ngFor="let cat of stream"
-             class="team-card w-40 h-40 flex-shrink-0 bg-white shadow rounded-lg flex flex-col items-center justify-center
-                    border border-gray-200 hover:shadow-lg hover:-translate-y-0.5 transition cursor-pointer mx-auto"
-             (click)="goToCategory(cat)">
-          <img [src]="cat.image?.src || '/assets/placeholder.png'"
-               [alt]="cat.name"
-               class="h-20 object-contain mb-3" />
-          <span class="text-sm font-medium text-gray-700 text-center px-2">{{ cat.name }}</span>
+             class="team-card"
+             (click)="goToCategory(cat)"
+             tabindex="0"
+             (keyup.enter)="goToCategory(cat)"
+             (keyup.space)="goToCategory(cat)">
+          <img loading="lazy"
+               [src]="cat.image?.src || '/assets/placeholder.png'"
+               [alt]="cat.name" />
+          <span class="label">{{ cat.name }}</span>
         </div>
       </div>
     </div>

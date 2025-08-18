@@ -1,25 +1,21 @@
+import { registerLocaleData } from '@angular/common';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { ApplicationConfig } from '@angular/core';
+import localeIt from '@angular/common/locales/it';
+import { ApplicationConfig, LOCALE_ID, NgZone } from '@angular/core';
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter, withEnabledBlockingInitialNavigation } from '@angular/router';
+import { provideIcons } from '@ng-icons/core';
+import * as heroiconsOutline from '@ng-icons/heroicons/outline';
 import { routes } from './app.routes';
 import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
-import { provideAnimations } from '@angular/platform-browser/animations';
-import { AuthGuard } from './core/guard/auth.guard';
-import { StoreApiInterceptor } from './core/services/store-api.interceptor';
 import { StoreInterceptor } from './core/interceptors/store.interceptor';
-import { LOCALE_ID } from '@angular/core';
-import localeIt from '@angular/common/locales/it';
-import { registerLocaleData } from '@angular/common';
-import { NgIconComponent, provideIcons } from '@ng-icons/core';
-import { heroUsers } from '@ng-icons/heroicons/outline';
-import { appIconProviders } from './icons.provider';
 
 
 registerLocaleData(localeIt); // <-- carica i dati 'it'
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes,withEnabledBlockingInitialNavigation()),
+    provideRouter(routes, withEnabledBlockingInitialNavigation()),
     provideHttpClient(withInterceptorsFromDi()),
     {
       provide: HTTP_INTERCEPTORS,
@@ -33,6 +29,6 @@ export const appConfig: ApplicationConfig = {
     },
     provideAnimations(),
     { provide: LOCALE_ID, useValue: 'it-IT' },
-    ...appIconProviders 
+    provideIcons(heroiconsOutline)
   ]
 };

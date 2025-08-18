@@ -1,7 +1,16 @@
-/* opzionale: scrollbar più fine su WebKit */
-:host ::-webkit-scrollbar { width: 10px; }
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+:host ::-webkit-scrollbar {
+  width: 10px;
+}
 :host ::-webkit-scrollbar-thumb {
   background: rgba(0,0,0,.12);
   border-radius: 8px;
 }
-:host ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,.18); }
+:host ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,0,0,.18);
+}

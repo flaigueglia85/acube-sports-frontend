@@ -7,6 +7,8 @@
     "start": "ng serve --proxy-config proxy.conf.json",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
+    "prod":"ng build --configuration production",
+    "build:wp": "ng build --configuration production && powershell -Command \"Remove-Item -Recurse -Force ../../wp-content/themes/acube-sports/browser; New-Item -ItemType Directory -Force ../../wp-content/themes/acube-sports; Copy-Item -Recurse dist/acube-sports/browser/* ../../wp-content/themes/acube-sports/\"",
     "test": "ng test"
   },
   "private": true,

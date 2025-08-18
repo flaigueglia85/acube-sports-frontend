@@ -1,0 +1,26 @@
+<div class="p-6 space-y-4">
+  <div class="flex justify-between items-center">
+    <h2 class="text-lg font-bold">Ordine #{{ order?.id }}</h2>
+    <button (click)="close()" aria-label="Chiudi">
+      ✕
+    </button>
+  </div>
+
+  <ng-container *ngIf="loading">Caricamento...</ng-container>
+
+  <ng-container *ngIf="order">
+    <p class="text-sm text-gray-600">Stato: <strong>{{ order.status }}</strong></p>
+    <p class="text-sm text-gray-500">Data: {{ order.date }}</p>
+
+    <ul class="divide-y mt-4">
+      <li *ngFor="let item of order.items" class="py-2 flex justify-between">
+        <span>{{ item.quantity }}x {{ item.name }}</span>
+        <span>{{ item.total | currency:'EUR' }}</span>
+      </li>
+    </ul>
+
+    <div class="text-right font-semibold mt-4 border-t pt-2">
+      Totale: {{ order.total | currency:'EUR' }}
+    </div>
+  </ng-container>
+</div>
